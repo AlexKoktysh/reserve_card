@@ -6,8 +6,7 @@ import { useEffect } from "react";
 
 export const ReserveComponent = (props) => {
     const {
-        data,
-        saveChange,
+        update,
         totalRecords,
         pagination,
         setPagination,
@@ -61,7 +60,7 @@ export const ReserveComponent = (props) => {
                     ActionsComponent: () => PaginationComponent({ setPagination, pagination })
                 }}
             />
-            <Button variant="contained">Сохранить все</Button>
+            <Button variant="contained" onClick={update}>Сохранить все</Button>
         </div>
     );
 };

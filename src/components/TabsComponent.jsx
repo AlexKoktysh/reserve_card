@@ -24,7 +24,6 @@ const TabPanel = (props) => {
 
 export const TabsComponent = (props) => {
     const {
-        productData,
         reserveData,
         save,
         totalRecords,
@@ -39,6 +38,7 @@ export const TabsComponent = (props) => {
         setGlobalFilter,
         rows,
         columns,
+        update,
     } = props;
     const [value, setValue] = useState(0);
 
@@ -60,8 +60,7 @@ export const TabsComponent = (props) => {
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <ReserveComponent
-                    saveChange={save}
-                    data={productData}
+                    update={update}
                     totalRecords={totalRecords}
                     pagination={pagination}
                     setPagination={setPagination}

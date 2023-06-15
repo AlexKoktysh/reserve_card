@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { TabsComponent } from "./components/TabsComponent";
 import { reserveItemInfo } from "./api";
 import UserDialogComponent from "./components/UserDialogComponent";
-import { Input } from "@mui/material";
+import { Button, Input } from "@mui/material";
 
 const start_columns = [
   {
@@ -97,7 +97,6 @@ const start_columns = [
 ];
 
 export const App = () => {
-  const [product, setProductData] = useState([]);
   const [reserve, setReserveData] = useState({});
   const [data, setData] = useState({});
   const [show, setShow] = useState(false);
@@ -117,14 +116,14 @@ export const App = () => {
   const [rows, setRows] = useState([]);
   const [columns, setColumns] = useState(start_columns);
 
-  const getInfo = async () => {
-    const params = { filters: columnFilters, sorting, take: pagination.pageSize, skip: pagination.skip, searchText: globalFilter };
-    const data = await reserveItemInfo(params);
-    const { productData, reserveData } = data;
-    setData(data);
-    setProductData(productData);
-    setReserveData(reserveData);
-  };
+  // const getInfo = async () => {
+  //   const params = { filters: columnFilters, sorting, take: pagination.pageSize, skip: pagination.skip, searchText: globalFilter };
+  //   const data = await reserveItemInfo(params);
+  //   const { productData, reserveData } = data;
+  //   setData(data);
+  //   setProductData(productData);
+  //   setReserveData(reserveData);
+  // };
 
   const save = (obj) => {
     setShow(true);
@@ -135,42 +134,65 @@ export const App = () => {
       };
     });
   };
-
+  const update = () => {
+    setRows((prev) => {
+      setData({
+        productData: {
+          rows: prev
+        }
+      })
+      return prev;
+    });
+    setColumns((prev) => {
+      setData((pr) => {
+        return {
+          ...pr,
+          productData: {
+            ...pr.productData,
+            columns: prev
+          },
+        };
+      });
+      return prev;
+    });
+    setReserveData((prev) => {
+      setData((pr) => {
+        return {
+          ...pr,
+          reserveData: {
+            ...prev,
+          },
+        };
+      });
+      return prev;
+    });
+    console.log(data)
+  };
+  // useEffect(() => {
+  //   console.log(data)
+  // }, [data])
+  const remove = (id) => {};
+  const change = (id, value) => {
+    setRows((prev) => {
+      const obj = prev.map((row) => {
+        if (row.id === id) {
+          return {
+            ...row,
+            qty: <Input value={value} onChange={(e) => change(row.id, e.target.value)} />,
+          };
+        }
+        return row;
+      });
+      return obj;
+    });
+  };
   const close = () => {};
 
   const fetchProduct = async (params) => {
-    setRows([]);
     setLoading(true);
     const data = await reserveItemInfo(params);
     const { productData, reserveData } = data;
     const { columns, rows } = productData;
-    const change = (id, value) => {
-      setRows((prev) => {
-        const obj = prev.map((row) => {
-          if (row.id === id) {
-            return {
-              ...row,
-              qty: <Input value={value} onChange={(e) => change(row.id, e.target.value)} />,
-            };
-          }
-          return row;
-        });
-        return obj;
-      });
-    };
-    const update = (id) => {
-      console.log(rows);
-      debugger;
-    };
-    const remove = (id, value) => {
-      console.log(rows);
-      const obj = {
-        reserveData,
-      };
-      // console.log("obj", obj)
-      // console.log("id", id)
-      // console.log("value", value)
-    };
     const custom_rows = rows?.map((row) => {
       return {
         ...row,
@@ -185,14 +207,15 @@ export const App = () => {
             agreeActionText="Да"
             desAgreeActionText="Нет"
             desAgreeActionFunc={close}
-            agreeActionFunc={(e, value) => remove(row?.id, value)}
+            agreeActionFunc={() => remove(row?.id)}
             max_qty={row?.qty}
             disabled={row?.add_to_reserve?.disabled}
           />
         ),
-        update_reserve: update(row?.id),
+        update_reserve: <Button onClick={update}>Сохранить</Button>,
       };
     });
+    setReserveData(reserveData);
     setRows(custom_rows);
     setColumns(columns);
     setTotalRecords(totalRecords);
@@ -232,12 +255,8 @@ export const App = () => {
       });
   }, [pagination.page, pagination.pageSize]);
 
-  useEffect(() => {
-    getInfo();
-  }, []);
   return (
     <TabsComponent
-      productData={product}
       reserveData={reserve}
       save={save}
       totalRecords={totalRecords}
@@ -252,6 +271,7 @@ export const App = () => {
       setGlobalFilter={setGlobalFilter}
       rows={rows}
       columns={columns}
+      update={update}
     />
   );
 };
