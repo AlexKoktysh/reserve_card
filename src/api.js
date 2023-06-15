@@ -14,7 +14,7 @@ instance.interceptors.response.use(
     (error) => alert(error),
 );
 
-export const reserveItemInfo = async () => {
-    const data = await instance.post("/reserve_item_info", { "document_id": "0000568075" });
+export const reserveItemInfo = async (params) => {
+    const data = await instance.post("/reserve_item_info", { ...params, "document_id": "0000581947" });
     return data;
 };

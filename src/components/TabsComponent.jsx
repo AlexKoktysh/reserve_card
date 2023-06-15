@@ -38,6 +38,7 @@ export const TabsComponent = (props) => {
         globalFilter,
         setGlobalFilter,
         rows,
+        columns,
     } = props;
     const [value, setValue] = useState(0);
 
@@ -72,6 +73,7 @@ export const TabsComponent = (props) => {
                     globalFilter={globalFilter}
                     setGlobalFilter={setGlobalFilter}
                     rows={rows}
+                    columns={columns}
                 />
             </TabPanel>
         </Box>

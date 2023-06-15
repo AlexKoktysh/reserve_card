@@ -140,10 +140,10 @@ export const App = () => {
   const fetchProduct = async (params) => {
     setRows([]);
     setLoading(true);
-    // const { rows, columns, totalRecords } = await getAllProduct(params);
     const data = await reserveItemInfo(params);
     const { productData, reserveData } = data;
-    const custom_rows = productData?.map((row) => {
+    const { columns, rows } = productData;
+    const custom_rows = rows?.map((row) => {
       return {
         ...row,
         qty: (
@@ -222,6 +222,7 @@ export const App = () => {
       globalFilter={globalFilter}
       setGlobalFilter={setGlobalFilter}
       rows={rows}
+      columns={columns}
     />
   );
 };
