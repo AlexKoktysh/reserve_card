@@ -118,7 +118,8 @@ export const App = () => {
   const [columns, setColumns] = useState(start_columns);
 
   const getInfo = async () => {
-    const data = await reserveItemInfo();
+    const params = { filters: columnFilters, sorting, take: pagination.pageSize, skip: pagination.skip, searchText: globalFilter };
+    const data = await reserveItemInfo(params);
     const { productData, reserveData } = data;
     setData(data);
     setProductData(productData);
@@ -143,13 +144,40 @@ export const App = () => {
     const data = await reserveItemInfo(params);
     const { productData, reserveData } = data;
     const { columns, rows } = productData;
+    const change = (id, value) => {
+      setRows((prev) => {
+        const obj = prev.map((row) => {
+          if (row.id === id) {
+            return {
+              ...row,
+              qty: <Input value={value} onChange={(e) => change(row.id, e.target.value)} />,
+            };
+          }
+          return row;
+        });
+        return obj;
+      });
+    };
+    const update = (id) => {
+      console.log(rows);
+      debugger;
+    };
+    const remove = (id, value) => {
+      console.log(rows);
+      const obj = {
+        reserveData,
+      };
+      // console.log("obj", obj)
+      // console.log("id", id)
+      // console.log("value", value)
+    };
     const custom_rows = rows?.map((row) => {
       return {
         ...row,
         qty: (
-          <Input value={row?.qty} />
+          <Input value={row?.qty} onChange={(e) => change(row.id, e.target.value)} />
         ),
-        action: (
+        remove_position: (
           <UserDialogComponent
             openDialogText="Удалить из резерва"
             openedDialogTitle="Удалить из резерва"
@@ -157,11 +185,12 @@ export const App = () => {
             agreeActionText="Да"
             desAgreeActionText="Нет"
             desAgreeActionFunc={close}
-            // agreeActionFunc={(e, value) => addToReserve(row?.add_to_reserve?.product_id, value)}
+            agreeActionFunc={(e, value) => remove(row?.id, value)}
             max_qty={row?.qty}
             disabled={row?.add_to_reserve?.disabled}
           />
         ),
+        update_reserve: update(row?.id),
       };
     });
     setRows(custom_rows);
