@@ -116,29 +116,36 @@ export const App = () => {
   const [rows, setRows] = useState([]);
   const [columns, setColumns] = useState(start_columns);
 
-  // const getInfo = async () => {
-  //   const params = { filters: columnFilters, sorting, take: pagination.pageSize, skip: pagination.skip, searchText: globalFilter };
-  //   const data = await reserveItemInfo(params);
-  //   const { productData, reserveData } = data;
-  //   setData(data);
-  //   setProductData(productData);
-  //   setReserveData(reserveData);
-  // };
-
   const save = (obj) => {
+    const items = {}
+    for (const key in obj.reserveData) {
+      items[key] = obj.reserveData[key]?.value;
+    }
     setShow(true);
-    setData((prev) => {
+    setData(() => {
+      const custom = rows.map((el) => {
+        return {
+          ...el,
+          qty: el.qty.props.value
+        };
+      });
       return {
-        ...prev,
-        ...obj,
+        productData: custom,
+        reserveData: items,
       };
     });
   };
   const update = () => {
     setRows((prev) => {
+      const item = prev.map((el) => {
+        return {
+          ...el,
+          qty: el.qty.props.value
+        };
+      });
       setData({
         productData: {
-          rows: prev
+          rows: item
         }
       })
       return prev;
@@ -156,21 +163,24 @@ export const App = () => {
       return prev;
     });
     setReserveData((prev) => {
+      const items = {}
+      for (const key in prev) {
+        items[key] = prev[key]?.value;
+      }
       setData((pr) => {
         return {
           ...pr,
           reserveData: {
-            ...prev,
+            ...items,
           },
         };
       });
       return prev;
     });
-    console.log(data)
   };
-  // useEffect(() => {
-  //   console.log(data)
-  // }, [data])
+  useEffect(() => {
+    data?.productData && console.log(data)
+  }, [data])
   const remove = (id) => {};
   const change = (id, value) => {
     setRows((prev) => {
@@ -241,9 +251,6 @@ export const App = () => {
     ],
   );
 
-  useEffect(() => {
-    show && console.log(data);
-  }, [data, show]);
   useEffect(() => {
     setPagination((prev) => {
         return { ...prev, pageCount: Math.ceil(totalRecords / pagination.pageSize) };
