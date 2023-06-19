@@ -179,7 +179,52 @@ export const App = () => {
   };
   useEffect(() => {
     const fetch = async (params) => {
-      const server = await updateItems(params);
+      setLoading(true);
+      setDisabled(true);
+      const data = await updateItems(params);
+      const { productData, reserveData } = data;
+      const { columns, rows } = productData;
+      const custom_rows = rows?.map((row) => {
+        return {
+          ...row,
+          qty: (
+            <Box className='reserve-qty-container'>
+              <Input
+                value={row?.qty}
+                onChange={(e) => change(row.id, e.target.value)}
+              />
+              <Button
+                size='small'
+                variant='contained'
+                className='button disable-warning-button'
+                disabled={disabled}
+                // endIcon={<EditDocIcon />}
+                onClick={() => clickUpdate(rows)}
+              >
+                Сохранить
+              </Button>
+            </Box>
+          ),
+          remove_position: (
+            <UserDialogComponent
+              disabled={false}
+              openDialogText={"Удалить"}
+              // openDialogIcon={<RecycleIcon />}
+              agreeActionFunc={() => remove(row)}
+              agreeActionText='Подтвердить'
+              openedDialogTitle='Удаление товарной позиции из резерва'
+              openedDialogMessage={`После нажатия кнопки "Подтвердить", товар будет будет исключен из резерва,продолжить?`}
+              className='button cancel-button'
+              containerClassname='text-center'
+            />
+          ),
+        };
+      });
+      setReserveData(reserveData);
+      setRows(custom_rows);
+      setColumns(columns);
+      setTotalRecords(totalRecords);
+      setLoading(false);
     };
     if (data?.productData) {
       fetch(data);
