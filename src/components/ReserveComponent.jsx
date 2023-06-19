@@ -18,7 +18,11 @@ export const ReserveComponent = (props) => {
         globalFilter,
         setGlobalFilter,
         rows,
-        columns
+        columns,
+        setRowSelection,
+        rowSelection,
+        removeFields,
+        disabled,
     } = props;
     useEffect(() => {
         const item = document.getElementsByClassName("pagination");
@@ -26,12 +30,24 @@ export const ReserveComponent = (props) => {
         parent.style.width = "100%";
         parent.style.border = "1px solid #e0e0e0";
     }, [rows]);
+
+    const updateFields = () => {
+        const obj = rows.map((row) => {
+            return {
+                ...row,
+                qty: row.qty.props.children[0].props.value,
+            };
+        });
+        update({ productData: obj });
+    };
     return (
         <div style={{ height: 1000, width: '100%', overflowY: 'auto' }}>
             <MaterialReactTable
                 columns={columns}
                 data={rows}
-                enableRowSelection={false}
+                enableRowSelection
+                getRowId={(row) => row.id}
+                onRowSelectionChange={setRowSelection}
                 initialState={{ density: 'compact' }}
                 state={{
                     pagination,
@@ -39,6 +55,7 @@ export const ReserveComponent = (props) => {
                     columnFilters,
                     globalFilter,
                     showSkeletons: loading,
+                    rowSelection,
                 }}
                 onPaginationChange={setPagination}
                 onSortingChange={setSorting}
@@ -60,7 +77,8 @@ export const ReserveComponent = (props) => {
                     ActionsComponent: () => PaginationComponent({ setPagination, pagination })
                 }}
             />
-            <Button variant="contained" onClick={update}>Сохранить все</Button>
+            <Button variant="contained" disabled={disabled} onClick={updateFields}>Сохранить все</Button>
+            <Button variant="contained" onClick={removeFields}>Удалить все</Button>
         </div>
     );
 };

@@ -1,132 +1,145 @@
-import { useEffect, useState } from "react";
-import { TabsComponent } from "./components/TabsComponent";
-import { reserveItemInfo } from "./api";
-import UserDialogComponent from "./components/UserDialogComponent";
 import { Button, Input } from "@mui/material";
+import Box from "@mui/material/Box/Box";
+import { useEffect, useState } from "react";
+import { removeItem, reserveItemInfo, updateItems } from "./api";
+import UserDialogComponent from "./components/UserDialogComponent";
+import { TabsComponent } from "./components/TabsComponent.jsx";
 
 const start_columns = [
   {
-    "accessorKey": "id",
-    "header": "№",
-    "enableSorting": false,
-    "enableColumnFilter": false,
-    "enableColumnActions": false,
-    "enableGlobalFilter": false,
-    "size": 60,
-    "muiTableHeadCellProps": {
-        "align": "center"
+    accessorKey: "id",
+    header: "№",
+    enableSorting: false,
+    enableColumnFilter: false,
+    enableColumnActions: false,
+    enableGlobalFilter: false,
+    size: 60,
+    muiTableHeadCellProps: {
+      align: "center",
     },
-    "muiTableBodyCellProps": {
-        "align": "center"
-    }
+    muiTableBodyCellProps: {
+      align: "center",
+    },
   },
   {
-    "accessorKey": "name_print",
-    "header": "Наименование товара",
-    "enableGlobalFilter": false,
-    "size": 60,
-    "muiTableHeadCellProps": {
-        "align": "center"
+    accessorKey: "name_print",
+    header: "Наименование товара",
+    enableGlobalFilter: false,
+    size: 60,
+    muiTableHeadCellProps: {
+      align: "center",
     },
-    "muiTableBodyCellProps": {
-        "align": "center"
-    }
+    muiTableBodyCellProps: {
+      align: "center",
+    },
   },
   {
-    "accessorKey": "price",
-    "enableGlobalFilter": false,
-    "header": "Цена за ед-цу (BYN)",
-    "muiTableHeadCellProps": {
-        "align": "center"
+    accessorKey: "price",
+    enableGlobalFilter: false,
+    header: "Цена за ед-цу (BYN)",
+    muiTableHeadCellProps: {
+      align: "center",
     },
-    "muiTableBodyCellProps": {
-        "align": "center"
+    muiTableBodyCellProps: {
+      align: "center",
     },
-    "size": 60
+    size: 60,
   },
   {
-    "accessorKey": "article",
-    "enableGlobalFilter": false,
-    "header": "Артикул",
-    "muiTableHeadCellProps": {
-        "align": "center"
+    accessorKey: "article",
+    enableGlobalFilter: false,
+    header: "Артикул",
+    muiTableHeadCellProps: {
+      align: "center",
     },
-    "muiTableBodyCellProps": {
-        "align": "center"
+    muiTableBodyCellProps: {
+      align: "center",
     },
-    "size": 60
+    size: 60,
   },
   {
-    "accessorKey": "product_cost_with_vat",
-    "enableGlobalFilter": false,
-    "header": "Цена с НДС, BYN",
-    "muiTableHeadCellProps": {
-        "align": "center"
+    accessorKey: "product_cost_with_vat",
+    enableGlobalFilter: false,
+    header: "Цена с НДС, BYN",
+    muiTableHeadCellProps: {
+      align: "center",
     },
-    "muiTableBodyCellProps": {
-        "align": "center"
+    muiTableBodyCellProps: {
+      align: "center",
     },
-    "size": 60
+    size: 60,
   },
   {
-    "accessorKey": "qty",
-    "enableGlobalFilter": false,
-    "header": "Доступно для резерва",
-    "muiTableHeadCellProps": {
-        "align": "center"
+    accessorKey: "qty",
+    enableGlobalFilter: false,
+    header: "Зарезервировано",
+    muiTableHeadCellProps: {
+      align: "center",
     },
-    "muiTableBodyCellProps": {
-        "align": "center"
+    muiTableBodyCellProps: {
+      align: "center",
     },
-    "size": 60
+    size: 60,
   },
   {
-    "accessorKey": "action",
-    "header": "Добавить в резерв",
-    "enableSorting": false,
-    "enableColumnFilter": false,
-    "enableColumnActions": false,
-    "size": 60,
-    "muiTableHeadCellProps": {
-        "align": "center"
+    accessorKey: "action",
+    header: "Добавить в резерв",
+    enableSorting: false,
+    enableColumnFilter: false,
+    enableColumnActions: false,
+    size: 60,
+    muiTableHeadCellProps: {
+      align: "center",
     },
-    "muiTableBodyCellProps": {
-        "align": "center"
-    }
+    muiTableBodyCellProps: {
+      align: "center",
+    },
   },
 ];
 
 export const App = () => {
+  const [disabled, setDisabled] = useState(true);
   const [reserve, setReserveData] = useState({});
   const [data, setData] = useState({});
-  const [show, setShow] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(0);
 
   const [totalRecords, setTotalRecords] = useState(0);
   const [pagination, setPagination] = useState({
-    pageIndex: Number(sessionStorage.getItem("pageIndex")) || 0,
-    page: Number(sessionStorage.getItem("page")) || 1,
-    pageSize: Number(sessionStorage.getItem("pageSize")) || 10,
+    pageIndex:
+      Number(sessionStorage.getItem("tradeics_reserve_item_pageIndex")) || 0,
+    page: Number(sessionStorage.getItem("tradeics_reserve_item_page")) || 1,
+    pageSize:
+      Number(sessionStorage.getItem("tradeics_reserve_item_pageSize")) || 10,
     pageCount: Math.ceil(totalRecords / 10) || 0,
-    skip: Number(sessionStorage.getItem("skip")) || 0,
+    skip: Number(sessionStorage.getItem("tradeics_reserve_item_skip")) || 0,
   });
-  const [sorting, setSorting] = useState(JSON.parse(sessionStorage.getItem("sorting")) || []);
-  const [columnFilters, setColumnFilters] = useState(JSON.parse(sessionStorage.getItem("columnFilters")) || []);
-  const [globalFilter, setGlobalFilter] = useState(JSON.parse(sessionStorage.getItem("globalFilter")) || "");
+  const [sorting, setSorting] = useState(
+    JSON.parse(sessionStorage.getItem("tradeics_reserve_item_sorting")) || []
+  );
+  const [columnFilters, setColumnFilters] = useState(
+    JSON.parse(sessionStorage.getItem("tradeics_reserve_item_columnFilters")) ||
+      []
+  );
+  const [globalFilter, setGlobalFilter] = useState(
+    JSON.parse(sessionStorage.getItem("tradeics_reserve_item_globalFilter")) ||
+      ""
+  );
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
   const [columns, setColumns] = useState(start_columns);
+  const [rowSelection, setRowSelection] = useState({});
+  const [selected, setSelected] = useState({});
 
   const save = (obj) => {
-    const items = {}
+    const items = {};
     for (const key in obj.reserveData) {
       items[key] = obj.reserveData[key]?.value;
     }
-    setShow(true);
     setData(() => {
       const custom = rows.map((el) => {
         return {
           ...el,
-          qty: el.qty.props.value
+          qty: el.qty.props.children[0].props.value,
         };
       });
       return {
@@ -135,60 +148,79 @@ export const App = () => {
       };
     });
   };
-  const update = () => {
-    setRows((prev) => {
-      const item = prev.map((el) => {
-        return {
-          ...el,
-          qty: el.qty.props.value
-        };
-      });
-      setData({
-        productData: {
-          rows: item
-        }
-      })
-      return prev;
+  const clickUpdate = (obj) => {
+    const rows_item = obj.map((row) => {
+      return {
+        ...row,
+        qty: row.qty.props.children[0].props.value,
+      };
     });
-    setColumns((prev) => {
-      setData((pr) => {
-        return {
-          ...pr,
-          productData: {
-            ...pr.productData,
-            columns: prev
-          },
-        };
-      });
-      return prev;
-    });
+    const items = {};
     setReserveData((prev) => {
-      const items = {}
       for (const key in prev) {
         items[key] = prev[key]?.value;
       }
-      setData((pr) => {
-        return {
-          ...pr,
-          reserveData: {
-            ...items,
-          },
-        };
-      });
       return prev;
+    });
+    update({ productData: rows_item }, items);
+  };
+  const update = (obj, userItems) => {
+    let items = userItems;
+    if (!userItems) {
+      items = {};
+      for (const key in reserve) {
+        items[key] = reserve[key]?.value;
+      }
+    }
+    setData({
+      reserveData: items,
+      productData: obj.productData,
     });
   };
   useEffect(() => {
-    data?.productData && console.log(data)
-  }, [data])
-  const remove = (id) => {};
+    const fetch = async (params) => {
+      const server = await updateItems(params);
+    };
+    if (data?.productData) {
+      fetch(data);
+    }
+  }, [data]);
+  const remove = (obj) => {
+    let id = "";
+    setReserveData((prev) => {
+      id = prev["document_id"]?.value
+      return prev;
+    });
+    const removeobj = {
+      "name_print": [obj["name_print"]],
+      "reserve_id": id,
+    };
+    removeItem(removeobj);
+  };
   const change = (id, value) => {
+    setDisabled(false);
     setRows((prev) => {
       const obj = prev.map((row) => {
         if (row.id === id) {
           return {
             ...row,
-            qty: <Input value={value} onChange={(e) => change(row.id, e.target.value)} />,
+            qty: (
+              <Box className='reserve-qty-container'>
+                <Input
+                  value={value}
+                  onChange={(e) => change(row.id, e.target.value)}
+                />
+                <Button
+                  size='small'
+                  variant='contained'
+                  className='button disable-warning-button'
+                  // endIcon={<EditDocIcon />}
+                  onClick={() => clickUpdate(prev)}
+                >
+                  Сохранить
+                </Button>
+              </Box>
+            ),
           };
         }
         return row;
@@ -196,7 +228,6 @@ export const App = () => {
       return obj;
     });
   };
-  const close = () => {};
 
   const fetchProduct = async (params) => {
     setLoading(true);
@@ -207,22 +238,36 @@ export const App = () => {
       return {
         ...row,
         qty: (
-          <Input value={row?.qty} onChange={(e) => change(row.id, e.target.value)} />
+          <Box className='reserve-qty-container'>
+            <Input
+              value={row?.qty}
+              onChange={(e) => change(row.id, e.target.value)}
+            />
+            <Button
+              size='small'
+              variant='contained'
+              className='button disable-warning-button'
+              disabled={disabled}
+              // endIcon={<EditDocIcon />}
+              onClick={() => clickUpdate(rows)}
+            >
+              Сохранить
+            </Button>
+          </Box>
         ),
         remove_position: (
           <UserDialogComponent
-            openDialogText="Удалить из резерва"
-            openedDialogTitle="Удалить из резерва"
-            openedDialogMessage={true}
-            agreeActionText="Да"
-            desAgreeActionText="Нет"
-            desAgreeActionFunc={close}
-            agreeActionFunc={() => remove(row?.id)}
-            max_qty={row?.qty}
-            disabled={row?.add_to_reserve?.disabled}
+            disabled={false}
+            openDialogText={"Удалить"}
+            // openDialogIcon={<RecycleIcon />}
+            agreeActionFunc={() => remove(row)}
+            agreeActionText='Подтвердить'
+            openedDialogTitle='Удаление товарной позиции из резерва'
+            openedDialogMessage={`После нажатия кнопки "Подтвердить", товар будет будет исключен из резерва,продолжить?`}
+            className='button cancel-button'
+            containerClassname='text-center'
           />
         ),
-        update_reserve: <Button onClick={update}>Сохранить</Button>,
       };
     });
     setReserveData(reserveData);
@@ -233,52 +278,82 @@ export const App = () => {
   };
 
   useEffect(() => {
-      fetchProduct({ filters: columnFilters, sorting, take: pagination.pageSize, skip: pagination.skip, searchText: globalFilter });
-      sessionStorage.removeItem("pageIndex");
-      sessionStorage.removeItem("page");
-      sessionStorage.removeItem("pageSize");
-      sessionStorage.removeItem("skip");
-      sessionStorage.removeItem("sorting");
-      sessionStorage.removeItem("columnFilters");
-      sessionStorage.removeItem("globalFilter");
-    }, 
-    [
-      pagination.skip,
-      pagination.pageSize,
+    fetchProduct({
+      filters: columnFilters,
       sorting,
-      columnFilters,
-      globalFilter,
-    ],
-  );
+      take: pagination.pageSize,
+      skip: pagination.skip,
+      searchText: globalFilter,
+    });
+    sessionStorage.removeItem("tradeics_reserve_item_pageIndex");
+    sessionStorage.removeItem("tradeics_reserve_item_page");
+    sessionStorage.removeItem("tradeics_reserve_item_pageSize");
+    sessionStorage.removeItem("tradeics_reserve_item_skip");
+    sessionStorage.removeItem("tradeics_reserve_item_sorting");
+    sessionStorage.removeItem("tradeics_reserve_item_columnFilters");
+    sessionStorage.removeItem("tradeics_reserve_item_globalFilter");
+  }, [
+    pagination.skip,
+    pagination.pageSize,
+    sorting,
+    columnFilters,
+    globalFilter,
+  ]);
 
   useEffect(() => {
     setPagination((prev) => {
-        return { ...prev, pageCount: Math.ceil(totalRecords / pagination.pageSize) };
+      return {
+        ...prev,
+        pageCount: Math.ceil(totalRecords / pagination.pageSize),
+      };
     });
   }, [pagination?.pageSize, totalRecords]);
   useEffect(() => {
-      setPagination((prev) => {
-        return { ...prev, skip: pagination.page * pagination.pageSize - pagination.pageSize };
-      });
+    setPagination((prev) => {
+      return {
+        ...prev,
+        skip: pagination.page * pagination.pageSize - pagination.pageSize,
+      };
+    });
   }, [pagination.page, pagination.pageSize]);
 
+  useEffect(() => {
+    const items = [];
+    for (const key in rowSelection) {
+      const selectedRows = rows.find((row) => row.id === Number(key))["name_print"];
+      items.push(selectedRows);
+    }
+    setSelected({
+      "name_print": items,
+      "reserve_id": reserve["document_id"]?.value,
+    });
+  }, [rowSelection]);
+
   return (
-    <TabsComponent
-      reserveData={reserve}
-      save={save}
-      totalRecords={totalRecords}
-      pagination={pagination}
-      setPagination={setPagination}
-      sorting={sorting}
-      setSorting={setSorting}
-      columnFilters={columnFilters}
-      setColumnFilters={setColumnFilters}
-      loading={loading}
-      globalFilter={globalFilter}
-      setGlobalFilter={setGlobalFilter}
-      rows={rows}
-      columns={columns}
-      update={update}
-    />
+    <Box className='content-container'>
+      <TabsComponent
+        reserveData={reserve}
+        save={save}
+        totalRecords={totalRecords}
+        pagination={pagination}
+        setPagination={setPagination}
+        sorting={sorting}
+        setSorting={setSorting}
+        columnFilters={columnFilters}
+        setColumnFilters={setColumnFilters}
+        loading={loading}
+        globalFilter={globalFilter}
+        setGlobalFilter={setGlobalFilter}
+        rows={rows}
+        columns={columns}
+        update={update}
+        selectedTab={selectedTab}
+        setSelectedTabHandler={setSelectedTab}
+        setRowSelection={setRowSelection}
+        rowSelection={rowSelection}
+        removeFields={() => removeItem(selected)}
+        disabled={disabled}
+      />
+    </Box>
   );
 };

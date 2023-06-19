@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Tab, Tabs } from "@mui/material";
 import { GeneralComponent } from "./GeneralComponent";
 import { ReserveComponent } from "./ReserveComponent";
@@ -39,6 +39,10 @@ export const TabsComponent = (props) => {
         rows,
         columns,
         update,
+        setRowSelection,
+        rowSelection,
+        removeFields,
+        disabled,
     } = props;
     const [value, setValue] = useState(0);
 
@@ -73,6 +77,10 @@ export const TabsComponent = (props) => {
                     setGlobalFilter={setGlobalFilter}
                     rows={rows}
                     columns={columns}
+                    setRowSelection={setRowSelection}
+                    rowSelection={rowSelection}
+                    removeFields={removeFields}
+                    disabled={disabled}
                 />
             </TabPanel>
         </Box>

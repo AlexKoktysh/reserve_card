@@ -39,7 +39,7 @@ export const GeneralComponent = ({ data, saveChange }) => {
                     key={item.label}
                     label={item.label}
                     value={item.value}
-                    disabled={!(item.label === "Адрес доставки" || item.label === "Комментарий к резерву")}
+                    disabled={!(item.label === "Комментарий к резерву")}
                     changeInput={(e) => changeInput(e.target.value, item.label)}
                 />
             ))}
