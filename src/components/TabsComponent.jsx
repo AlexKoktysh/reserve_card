@@ -43,6 +43,7 @@ export const TabsComponent = (props) => {
         rowSelection,
         removeFields,
         disabled,
+        removedisabled,
     } = props;
     const [value, setValue] = useState(0);
 
@@ -81,6 +82,7 @@ export const TabsComponent = (props) => {
                     rowSelection={rowSelection}
                     removeFields={removeFields}
                     disabled={disabled}
+                    removedisabled={removedisabled}
                 />
             </TabPanel>
         </Box>

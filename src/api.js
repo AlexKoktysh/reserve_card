@@ -15,18 +15,16 @@ instance.interceptors.response.use(
 );
 
 export const reserveItemInfo = async (params) => {
-    const data = await instance.post("/reserve_item_info", { ...params, "document_id": "0000583717" });
+    const data = await instance.post("/reserve_item_info", { ...params, "document_id": "0000585578" });
     return data;
 };
 
 export const updateItems = async (params) => {
     const data = await instance.post("/update_reserve_item", { ...params });
     return data;
-    debugger;
 };
 
 export const removeItem = async (params) => {
-    const data = await instance.post("/update_reserve_item/remove_reserve_item", { ...params });
+    const data = await instance.post("/remove_reserve_item", { ...params });
     return data;
-    debugger;
 };

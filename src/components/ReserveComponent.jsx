@@ -3,6 +3,7 @@ import { MRT_Localization_RU } from "material-react-table/locales/ru";
 import PaginationComponent from "./PaginationComponent";
 import { Button } from "@mui/material";
 import { useEffect } from "react";
+import UserDialogComponent from "./UserDialogComponent";
 
 export const ReserveComponent = (props) => {
     const {
@@ -23,6 +24,7 @@ export const ReserveComponent = (props) => {
         rowSelection,
         removeFields,
         disabled,
+        removedisabled,
     } = props;
     useEffect(() => {
         const item = document.getElementsByClassName("pagination");
@@ -40,6 +42,11 @@ export const ReserveComponent = (props) => {
         });
         update({ productData: obj });
     };
+
+    useEffect(() => {
+        console.log(rows.length)
+    }, [rows])
+
     return (
         <div style={{ height: 1000, width: '100%', overflowY: 'auto' }}>
             <MaterialReactTable
@@ -68,6 +75,7 @@ export const ReserveComponent = (props) => {
                     maxSize: 300,
                     size: 250,
                 }}
+                muiToolbarAlertBannerProps={{ sx: { display: "none" }}}
                 muiTablePaginationProps={{
                     rowsPerPageOptions: [5, 10, 20],
                     showFirstButton: false,
@@ -78,7 +86,17 @@ export const ReserveComponent = (props) => {
                 }}
             />
             <Button variant="contained" disabled={disabled} onClick={updateFields}>Сохранить все</Button>
-            <Button variant="contained" onClick={removeFields}>Удалить все</Button>
+            <UserDialogComponent
+              disabled={removedisabled}
+              openDialogText={"Удалить все"}
+              // openDialogIcon={<RecycleIcon />}
+              agreeActionFunc={removeFields}
+              agreeActionText='Подтвердить'
+              openedDialogTitle='Удаление товарной позиции из резерва'
+              openedDialogMessage={`${Object.keys(rowSelection).length === rows.length ? "Резерв будет удален полность!" : "После нажатия кнопки Подтвердить, товары будут исключены из резерва, продолжить?"}`}
+              className='button cancel-button'
+              containerClassname='text-center'
+            />
         </div>
     );
 };
