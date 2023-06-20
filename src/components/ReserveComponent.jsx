@@ -43,10 +43,6 @@ export const ReserveComponent = (props) => {
         update({ productData: obj });
     };
 
-    useEffect(() => {
-        console.log(rows.length)
-    }, [rows])
-
     return (
         <div style={{ height: 1000, width: '100%', overflowY: 'auto' }}>
             <MaterialReactTable
@@ -83,6 +79,13 @@ export const ReserveComponent = (props) => {
                     width: "100%",
                     className: "pagination",
                     ActionsComponent: () => PaginationComponent({ setPagination, pagination })
+                }}
+                filterFns={{
+                    customFilterFn: (row, id, filterValue) => {
+                        const html = row.getValue(id);
+                        const reserved = html?.props?.children[0]?.props?.value;
+                        return reserved === filterValue;
+                    },
                 }}
             />
             <Button variant="contained" disabled={disabled} onClick={updateFields}>Сохранить все</Button>

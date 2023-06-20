@@ -11,7 +11,7 @@ const instance = axios.create({
 
 instance.interceptors.response.use(
     (response) => response.data,
-    (error) => alert(error),
+    (error) => ({ error: error.response.data }),
 );
 
 export const reserveItemInfo = async (params) => {

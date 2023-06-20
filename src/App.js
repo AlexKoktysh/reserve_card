@@ -1,4 +1,4 @@
-import { Button, Input } from "@mui/material";
+import { Alert, Button, Input } from "@mui/material";
 import Box from "@mui/material/Box/Box";
 import { useEffect, useState } from "react";
 import { removeItem, reserveItemInfo, updateItems } from "./api";
@@ -79,6 +79,7 @@ const start_columns = [
     muiTableBodyCellProps: {
       align: "center",
     },
+    filterFn: "customFilterFn",
     size: 60,
   },
   {
@@ -98,6 +99,7 @@ const start_columns = [
 ];
 
 export const App = () => {
+  const [allert, setAllert] = useState("");
   const [disabled, setDisabled] = useState(true);
   const [removedisabled, setRemovedisabled] = useState(true);
   const [reserve, setReserveData] = useState({});
@@ -183,6 +185,9 @@ export const App = () => {
       setLoading(true);
       setDisabled(true);
       const data = await updateItems(params);
+      if (data.error) {
+        return setAllert(data.error["ajax-response"]);
+      }
       const { productData, reserveData } = data;
       const { columns, rows } = productData;
       const custom_rows = custom(rows)
@@ -256,6 +261,9 @@ export const App = () => {
     setLoading(true);
     setDisabled(true);
     const data = await removeItem(removeobj);
+    if (data["ajax-response"]) {
+      return setAllert(data["ajax-response"]);
+    }
     const { productData, reserveData } = data;
     const { columns, rows } = productData;
     const custom_rows = custom(rows);
@@ -301,6 +309,9 @@ export const App = () => {
   const fetchProduct = async (params) => {
     setLoading(true);
     const data = await reserveItemInfo(params);
+    if (data.error) {
+      return setAllert(data.error["ajax-response"])
+    }
     const { productData, reserveData } = data;
     const { columns, rows } = productData;
     const custom_rows = custom(rows)
@@ -369,6 +380,10 @@ export const App = () => {
     }
     setRemovedisabled(true);
   }, [selected]);
+
+  if (allert) {
+    return <Alert severity="error">{allert}</Alert>;
+  }
 
   return (
     <Box className='content-container'>
