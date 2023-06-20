@@ -15,7 +15,7 @@ instance.interceptors.response.use(
 );
 
 export const reserveItemInfo = async (params) => {
-    const data = await instance.post("/reserve_item_info", { ...params, "document_id": "0000585578" });
+    const data = await instance.post("/reserve_item_info", { ...params, "document_id": "0000586175" });
     return data;
 };
 

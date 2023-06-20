@@ -384,6 +384,23 @@ export const App = () => {
   if (allert) {
     return <Alert severity="error">{allert}</Alert>;
   }
+  const removeServer = async (selected) => {
+    setRowSelection({});
+    setLoading(true);
+    setDisabled(true);
+    const data = await removeItem(selected);
+    if (data["ajax-response"]) {
+      return setAllert(data["ajax-response"]);
+    }
+    const { productData, reserveData } = data;
+    const { columns, rows } = productData;
+    const custom_rows = custom(rows);
+    setReserveData(reserveData);
+    setRows(custom_rows);
+    setColumns(columns);
+    setTotalRecords(totalRecords);
+    setLoading(false);
+  };
 
   return (
     <Box className='content-container'>
@@ -407,7 +424,7 @@ export const App = () => {
         setSelectedTabHandler={setSelectedTab}
         setRowSelection={setRowSelection}
         rowSelection={rowSelection}
-        removeFields={() => removeItem(selected)}
+        removeFields={() => removeServer(selected)}
         disabled={disabled}
         removedisabled={removedisabled}
       />
